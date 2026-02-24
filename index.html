@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retrospectiva 2025</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#020510;--bg2:#0a0f1e;--text:#fff;--text2:#e2e8f0;--text3:#cbd5e1;--text4:#94a3b8;--text5:#64748b;--text6:#475569;--text7:#334155;
+    --accent1:#06b6d4;--accent2:#6366f1;--accent3:#818cf8;--accent4:#22d3ee;--accent5:#67e8f9;
+    --card-bg:rgba(6,182,212,.03);--card-border:rgba(6,182,212,.08);--card-hover:rgba(6,182,212,.08);
+    --nav-bg:rgba(2,5,16,.6);--nav-border:rgba(6,182,212,.1);
+    --modal-bg:#0a0f1e;--modal-overlay:rgba(2,5,16,.85);
+    --input-bg:rgba(6,182,212,.05);--input-border:rgba(6,182,212,.15);
+    --select-option-bg:#0a0f1e;
+    --stat-bg:rgba(6,182,212,.04);--stat-border:rgba(6,182,212,.1);
+    --scan-color:rgba(6,182,212,.3);
+    --node-color1-r:6;--node-color1-g:182;--node-color1-b:212;
+    --node-color2-r:99;--node-color2-g:102;--node-color2-b:241;
+  }
+  body.light{
+    --bg:#f0f4f8;--bg2:#ffffff;--text:#1e293b;--text2:#1e293b;--text3:#334155;--text4:#475569;--text5:#64748b;--text6:#94a3b8;--text7:#cbd5e1;
+    --accent1:#00c4e0;--accent2:#2a2d7c;--accent3:#4a4dbd;--accent4:#00c4e0;--accent5:#5ce1e6;
+    --card-bg:rgba(42,45,124,.04);--card-border:rgba(42,45,124,.12);--card-hover:rgba(42,45,124,.08);
+    --nav-bg:rgba(255,255,255,.75);--nav-border:rgba(42,45,124,.1);
+    --modal-bg:#ffffff;--modal-overlay:rgba(240,244,248,.85);
+    --input-bg:rgba(42,45,124,.04);--input-border:rgba(42,45,124,.15);
+    --select-option-bg:#ffffff;
+    --stat-bg:rgba(42,45,124,.04);--stat-border:rgba(42,45,124,.1);
+    --scan-color:rgba(0,196,224,.15);
+    --node-color1-r:0;--node-color1-g:196;--node-color1-b:224;
+    --node-color2-r:42;--node-color2-g:45;--node-color2-b:124;
+  }
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .4s,color .4s}
+
+  #network-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+  .scan-line{position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--scan-color),transparent);z-index:1;pointer-events:none;animation:scanMove 8s linear infinite}
+  @keyframes scanMove{0%{top:-2px}100%{top:100vh}}
+
+  .orb{position:fixed;border-radius:50%;filter:blur(80px);opacity:.08;pointer-events:none;z-index:0}
+  .orb-1{width:500px;height:500px;background:radial-gradient(circle,#06b6d4,transparent);top:-150px;left:-100px;animation:orbFloat1 20s ease-in-out infinite}
+  .orb-2{width:400px;height:400px;background:radial-gradient(circle,#6366f1,transparent);bottom:-100px;right:-80px;animation:orbFloat2 25s ease-in-out infinite}
+  .orb-3{width:350px;height:350px;background:radial-gradient(circle,#8b5cf6,transparent);top:40%;left:60%;animation:orbFloat3 18s ease-in-out infinite}
+  @keyframes orbFloat1{0%,100%{transform:translate(0,0)}50%{transform:translate(60px,40px)}}
+  @keyframes orbFloat2{0%,100%{transform:translate(0,0)}50%{transform:translate(-50px,-30px)}}
+  @keyframes orbFloat3{0%,100%{transform:translate(0,0)}50%{transform:translate(-40px,50px)}}
+
+  .container{position:relative;z-index:2;max-width:1300px;margin:0 auto;padding:40px 24px 60px}
+
+  body.light .orb-1{background:radial-gradient(circle,#5ce1e6,transparent);opacity:.06}
+  body.light .orb-2{background:radial-gradient(circle,#2a2d7c,transparent);opacity:.05}
+  body.light .orb-3{background:radial-gradient(circle,#c8e600,transparent);opacity:.06}
+
+  .navbar{position:fixed;top:0;left:0;right:0;z-index:100;padding:12px 30px;display:flex;align-items:center;justify-content:space-between;background:var(--nav-bg);backdrop-filter:blur(20px);border-bottom:1px solid var(--nav-border);transition:background .4s,border .4s}
+  .nav-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1rem}
+  .nav-brand .dot{width:8px;height:8px;background:#06b6d4;border-radius:50%;animation:pulse 2s infinite}
+  .nav-brand span{background:linear-gradient(135deg,#06b6d4,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .nav-stats{display:flex;gap:20px;align-items:center}
+  .nav-stat{font-size:.7rem;color:#475569;font-weight:600;display:flex;align-items:center;gap:5px}
+  .nav-stat .val{color:#22d3ee;font-variant-numeric:tabular-nums}
+  .nav-actions{display:flex;gap:8px}
+
+  /* Theme toggle */
+  .theme-toggle{width:48px;height:26px;border-radius:13px;border:1px solid var(--nav-border);background:var(--input-bg);cursor:pointer;position:relative;transition:all .3s;flex-shrink:0;margin-left:8px}
+  .theme-toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--accent1);transition:all .3s;box-shadow:0 0 6px rgba(6,182,212,.3)}
+  body.light .theme-toggle::after{left:25px;background:#c8e600;box-shadow:0 0 6px rgba(200,230,0,.4)}
+  .theme-toggle-wrap{display:flex;align-items:center;gap:6px;margin-left:12px}
+  .theme-label{font-size:.65rem;color:var(--text6);font-weight:700;letter-spacing:1px;text-transform:uppercase}
+
+  .header{text-align:center;margin:80px 0 50px;position:relative}
+  .badge{display:inline-block;background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.2);padding:6px 20px;border-radius:50px;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#22d3ee;margin-bottom:20px;backdrop-filter:blur(10px)}
+  .header h1{font-size:clamp(2rem,5vw,3.5rem);font-weight:900;line-height:1.1;margin-bottom:12px;background:linear-gradient(135deg,#fff 0%,#67e8f9 30%,#818cf8 60%,#06b6d4 100%);background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gradShift 6s ease infinite}
+  @keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+  .header p{color:#475569;font-size:1.05rem}
+
+  .header-actions{position:absolute;top:0;right:0;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  .manage-btn{padding:10px 20px;border-radius:12px;border:1px solid rgba(6,182,212,.3);background:rgba(6,182,212,.08);color:var(--accent5);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .3s;display:flex;align-items:center;gap:8px;backdrop-filter:blur(10px)}
+  .manage-btn:hover{background:rgba(6,182,212,.2);transform:translateY(-1px);box-shadow:0 4px 25px rgba(6,182,212,.25)}
+  .manage-btn svg{width:16px;height:16px}
+  .io-btn{padding:8px 14px;border-radius:10px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text5);font-family:'Inter',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;backdrop-filter:blur(10px)}
+  .io-btn:hover{background:var(--card-hover);color:var(--text4)}
+  .io-btn svg{width:14px;height:14px}
+
+  .tabs{display:flex;justify-content:center;gap:8px;margin-bottom:40px;flex-wrap:wrap}
+  .tab-btn{padding:10px 22px;border-radius:50px;border:1px solid var(--card-border);background:var(--card-bg);color:var(--text6);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .3s;backdrop-filter:blur(5px)}
+  .tab-btn:hover{background:var(--card-hover);color:var(--text4);border-color:rgba(6,182,212,.2)}
+  .tab-btn.active{background:linear-gradient(135deg,rgba(6,182,212,.2),rgba(99,102,241,.2));color:var(--accent5);border-color:rgba(6,182,212,.4);box-shadow:0 0 20px rgba(6,182,212,.15)}
+  body.light .tab-btn.active{color:var(--accent2);background:linear-gradient(135deg,rgba(0,196,224,.15),rgba(42,45,124,.15))}
+
+  .tab-content{display:none}.tab-content.active{display:block;animation:fadeUp .5s ease}
+
+  .section-header{display:flex;align-items:center;gap:16px;margin-bottom:30px}
+  .section-icon{width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;backdrop-filter:blur(10px)}
+  .section-header h2{font-size:1.5rem;font-weight:800;color:var(--text2)}
+  .section-header .count{font-size:.85rem;color:var(--text6);font-weight:400}
+
+  .timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:30px}
+  .quarter-col{position:relative}
+  .quarter-label{text-align:center;font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:10px;border-radius:12px;margin-bottom:12px;backdrop-filter:blur(5px)}
+  .q1-label{background:rgba(99,102,241,.1);color:#818cf8;border:1px solid rgba(99,102,241,.15)}
+  .q2-label{background:rgba(6,182,212,.1);color:#22d3ee;border:1px solid rgba(6,182,212,.15)}
+  .q3-label{background:rgba(245,158,11,.1);color:#fbbf24;border:1px solid rgba(245,158,11,.15)}
+  .q4-label{background:rgba(16,185,129,.1);color:#34d399;border:1px solid rgba(16,185,129,.15)}
+
+  .card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:12px;padding:14px 16px;margin-bottom:8px;position:relative;overflow:hidden;transition:all .3s cubic-bezier(.4,0,.2,1);cursor:default;backdrop-filter:blur(5px)}
+  .card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity .3s}
+  .card:hover{background:var(--card-hover);border-color:rgba(6,182,212,.2);transform:translateY(-2px);box-shadow:0 10px 40px rgba(6,182,212,.1)}
+  .card:hover::before{opacity:1}
+  .card h3{font-size:.82rem;font-weight:600;color:var(--text3);line-height:1.3;padding-right:20px}
+  .card.highlight{border-left:3px solid}
+  .card.highlight::after{content:'⭐';position:absolute;top:8px;right:10px;font-size:10px}
+
+  .cat-ssvo .card::before{background:linear-gradient(90deg,#6366f1,transparent)}.cat-ssvo .card.highlight{border-left-color:#6366f1}
+  .cat-app .card::before{background:linear-gradient(90deg,#06b6d4,transparent)}.cat-app .card.highlight{border-left-color:#06b6d4}
+  .cat-devops .card::before{background:linear-gradient(90deg,#f59e0b,transparent)}.cat-devops .card.highlight{border-left-color:#f59e0b}
+  .cat-automacao .card::before{background:linear-gradient(90deg,#8b5cf6,transparent)}.cat-automacao .card.highlight{border-left-color:#8b5cf6}
+  .cat-falcon .card::before{background:linear-gradient(90deg,#f43f5e,transparent)}.cat-falcon .card.highlight{border-left-color:#f43f5e}
+
+  .ongoing-bar{grid-column:1/-1;background:var(--card-bg);border:1px dashed var(--card-border);border-radius:10px;padding:12px 18px;font-size:.78rem;color:var(--text6);display:flex;align-items:center;gap:10px;margin-top:4px;backdrop-filter:blur(5px)}
+  .ongoing-bar .pulse{width:8px;height:8px;background:var(--accent4);border-radius:50%;animation:pulse 2s infinite;flex-shrink:0;box-shadow:0 0 8px rgba(6,182,212,.5)}
+  .ongoing-bar span{color:var(--text5);font-weight:500}
+
+  .stats-bar{display:flex;justify-content:center;gap:40px;margin-bottom:50px;flex-wrap:wrap}
+  .stat{text-align:center;padding:20px 30px;background:var(--stat-bg);border:1px solid var(--stat-border);border-radius:16px;backdrop-filter:blur(10px);transition:all .3s}
+  .stat:hover{background:var(--card-hover);border-color:rgba(6,182,212,.2);box-shadow:0 0 30px rgba(6,182,212,.1)}
+  .stat-number{font-size:2.5rem;font-weight:800;background:linear-gradient(135deg,var(--accent4),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .stat-label{font-size:.7rem;color:var(--text6);text-transform:uppercase;letter-spacing:2px;font-weight:700;margin-top:4px}
+
+  .year-select-row{display:flex;align-items:center;gap:12px;margin-bottom:20px;justify-content:center}
+  .year-select-row label{font-size:.75rem;font-weight:600;color:var(--text6);text-transform:uppercase;letter-spacing:1px}
+  .year-select-row select{padding:11px 14px;border-radius:10px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text2);font-family:'Inter',sans-serif;font-size:.9rem;outline:none;transition:all .2s;backdrop-filter:blur(10px)}
+  .year-select-row select:focus{border-color:var(--accent1);box-shadow:0 0 0 3px rgba(6,182,212,.15)}
+  .year-select-row select option{background:var(--select-option-bg);color:var(--text2)}
+
+  .footer{text-align:center;margin-top:60px;padding-top:30px;border-top:1px solid var(--card-border);color:var(--text7);font-size:.8rem}
+
+  .modal-overlay{display:none;position:fixed;inset:0;background:var(--modal-overlay);backdrop-filter:blur(12px);z-index:1000;justify-content:center;align-items:flex-start;padding:40px 20px;overflow-y:auto}
+  .modal-overlay.open{display:flex}
+  .modal{background:var(--modal-bg);border:1px solid var(--card-border);border-radius:20px;width:100%;max-width:720px;padding:0;animation:modalIn .3s ease;box-shadow:0 25px 80px rgba(6,182,212,.08)}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;padding:24px 28px;border-bottom:1px solid var(--card-border)}
+  .modal-head h2{font-size:1.2rem;font-weight:800;color:var(--text2)}
+  .modal-close{width:36px;height:36px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:#64748b;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+  .modal-close:hover{background:rgba(244,63,94,.15);border-color:rgba(244,63,94,.3);color:#f43f5e}
+  .modal-body{padding:24px 28px}
+
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+  .form-row.full{grid-template-columns:1fr}
+  .form-group{display:flex;flex-direction:column;gap:6px}
+  .form-group label{font-size:.75rem;font-weight:600;color:var(--text6);text-transform:uppercase;letter-spacing:1px}
+  .form-group input,.form-group select{padding:11px 14px;border-radius:10px;border:1px solid var(--input-border);background:var(--input-bg);color:var(--text2);font-family:'Inter',sans-serif;font-size:.9rem;transition:all .2s;outline:none}
+  .form-group input:focus,.form-group select:focus{border-color:var(--accent1);box-shadow:0 0 0 3px rgba(6,182,212,.15)}
+  .form-group select option{background:var(--select-option-bg);color:var(--text2)}
+
+  .check-group{display:flex;align-items:center;gap:10px;margin-bottom:18px;cursor:pointer}
+  .check-group input[type=checkbox]{width:20px;height:20px;accent-color:var(--accent1);cursor:pointer}
+  .check-group span{font-size:.85rem;color:var(--text5);font-weight:500}
+
+  .form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
+  .btn{padding:10px 24px;border-radius:10px;font-family:'Inter',sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:all .2s;border:none}
+  .btn-primary{background:linear-gradient(135deg,#0891b2,#6366f1);color:#fff;box-shadow:0 4px 20px rgba(6,182,212,.3)}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 30px rgba(6,182,212,.4)}
+  .btn-cancel{background:var(--card-bg);border:1px solid var(--card-border);color:var(--text5)}
+  .btn-cancel:hover{background:var(--card-hover)}
+
+  .project-list{margin-top:20px;border-top:1px solid var(--card-border);padding-top:16px}
+  .project-list h3{font-size:.85rem;font-weight:700;color:var(--text5);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .project-list h3 .pl-count{background:rgba(6,182,212,.15);color:var(--accent4);padding:2px 8px;border-radius:20px;font-size:.7rem}
+  .pl-scroll{max-height:320px;overflow-y:auto;padding-right:4px}
+  .pl-scroll::-webkit-scrollbar{width:6px}
+  .pl-scroll::-webkit-scrollbar-track{background:rgba(6,182,212,.03);border-radius:3px}
+  .pl-scroll::-webkit-scrollbar-thumb{background:rgba(6,182,212,.2);border-radius:3px}
+  .pl-scroll::-webkit-scrollbar-thumb:hover{background:rgba(6,182,212,.4)}
+
+  .pl-filters{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .pl-filter{padding:5px 14px;border-radius:20px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:#475569;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .2s}
+  .pl-filter:hover{background:rgba(6,182,212,.08);color:#94a3b8}
+  .pl-filter.active{background:rgba(6,182,212,.12);border-color:rgba(6,182,212,.25);color:#22d3ee}
+
+  .pl-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;margin-bottom:6px;transition:all .2s}
+  .pl-item:hover{background:var(--card-hover);border-color:rgba(6,182,212,.15)}
+  .pl-item-info{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+  .pl-item-name{font-size:.8rem;font-weight:600;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pl-item-meta{display:flex;gap:6px;align-items:center;flex-shrink:0}
+  .pl-tag{padding:2px 8px;border-radius:6px;font-size:.65rem;font-weight:700;letter-spacing:.5px}
+  .pl-tag-q1{background:rgba(99,102,241,.12);color:#818cf8}.pl-tag-q2{background:rgba(6,182,212,.12);color:#22d3ee}
+  .pl-tag-q3{background:rgba(245,158,11,.12);color:#fbbf24}.pl-tag-q4{background:rgba(16,185,129,.12);color:#34d399}
+  .pl-tag-star{background:rgba(251,191,36,.08);color:#fbbf24;font-size:.6rem}
+  .pl-actions{display:flex;gap:4px;margin-left:10px;flex-shrink:0}
+  .pl-actions button{width:28px;height:28px;border-radius:6px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.02);color:#475569;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .2s}
+  .pl-actions button:hover{background:rgba(6,182,212,.1);color:#e2e8f0}
+  .pl-actions button.del:hover{background:rgba(244,63,94,.12);color:#f43f5e;border-color:rgba(244,63,94,.2)}
+  .pl-empty{text-align:center;padding:30px;color:#334155;font-size:.85rem}
+  .empty-q{min-height:40px}
+
+  @keyframes fadeDown{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 8px rgba(6,182,212,.5)}50%{opacity:.4;box-shadow:0 0 2px rgba(6,182,212,.2)}}
+  @keyframes modalIn{from{opacity:0;transform:translateY(-20px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+  @media(max-width:768px){.timeline{grid-template-columns:1fr 1fr}.ongoing-bar{grid-column:1/-1}.form-row{grid-template-columns:1fr}.header-actions{position:relative;justify-content:center;margin-top:16px}.navbar{padding:10px 16px}.nav-stats{display:none}}
+  @media(max-width:480px){.timeline{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<canvas id="network-canvas"></canvas>
+<div class="scan-line"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<nav class="navbar">
+  <div class="nav-brand"><div class="dot"></div><span>RETRO // 2025</span></div>
+  <div class="nav-stats">
+    <div class="nav-stat">Nós ativos: <span class="val" id="ns-nodes">0</span></div>
+    <div class="nav-stat">Conexões: <span class="val" id="ns-connections">0</span></div>
+    <div class="nav-stat">Latência: <span class="val" id="ns-latency">0ms</span></div>
+  </div>
+  <div class="nav-actions">
+    <button class="io-btn" onclick="exportJSON()" title="Exportar JSON">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Exportar
+    </button>
+    <button class="io-btn" onclick="document.getElementById('import-file').click()" title="Importar JSON">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      Importar
+    </button>
+    <input type="file" id="import-file" accept=".json" style="display:none" onchange="importJSON(event)">
+    <div class="theme-toggle-wrap">
+      <span class="theme-label" id="theme-label">🌙</span>
+      <div class="theme-toggle" onclick="toggleTheme()" title="Alternar tema"></div>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="header">
+    <div class="badge">◈ Retrospectiva Anual</div>
+    <h1>Projetos executados<br><span id="display-year">2025</span></h1>
+    <p>Resumo das principais entregas e iniciativas do ano</p>
+    <div class="header-actions">
+      <button class="manage-btn" onclick="openModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        Gerenciar Projetos
+      </button>
+    </div>
+  </div>
+
+  <div class="year-select-row">
+    <label>Ano:</label>
+    <select id="yearSelector" onchange="changeYear(this.value)">
+      <option value="2025"selected>2025</option>
+      <option value="2026">2026</option>
+      <option value="2027">2027</option>
+    </select>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-number" id="stat-squads">5</div><div class="stat-label">Squads</div></div>
+    <div class="stat"><div class="stat-number" id="stat-entregas">0</div><div class="stat-label">Entregas</div></div>
+    <div class="stat"><div class="stat-number" id="stat-trimestres">4</div><div class="stat-label">Trimestres</div></div>
+  </div>
+
+  <div class="tabs" id="tabs-container"></div>
+  <div id="content-container"></div>
+  <div class="footer">Retrospectiva <span id="footer-year">2026</span> &nbsp;·&nbsp; Todos os direitos reservados</div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="modal-title">Gerenciar Projetos</h2>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="form-section">
+        <div class="form-row full">
+          <div class="form-group"><label>Nome do Projeto</label><input type="text" id="f-name" placeholder="Ex: Migração para Kubernetes"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Squad</label>
+            <select id="f-squad"><option value="">Selecione...</option><option value="ssvo">SSVO</option><option value="app">App Minha Unifique</option><option value="devops">DevOps</option><option value="automacao">Automação</option><option value="falcon">Falcon</option></select>
+          </div>
+          <div class="form-group"><label>Trimestre</label>
+            <select id="f-quarter"><option value="">Selecione...</option><option value="Q1">Q1</option><option value="Q2">Q2</option><option value="Q3">Q3</option><option value="Q4">Q4</option></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Ano</label>
+            <select id="f-year"><option value="">Selecione...</option><option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option></select>
+          </div>
+          <div class="form-group" style="justify-content:flex-end"><label>&nbsp;</label>
+            <label class="check-group" style="margin:0"><input type="checkbox" id="f-highlight"><span>⭐ Projeto Destaque</span></label>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-cancel" onclick="filterProjects()"><span style="display:flex;align-items:center;gap:6px">🔍 Filtrar</span></button>
+          <button class="btn btn-cancel" onclick="clearFilter()" id="btn-clear-filter" style="display:none">✕ Limpar Filtro</button>
+          <button class="btn btn-primary" id="btn-save" onclick="saveProject()">Adicionar Projeto</button>
+        </div>
+      </div>
+      <div class="project-list">
+        <h3>Projetos cadastrados <span class="pl-count" id="pl-count">0</span></h3>
+        <div class="pl-filters" id="pl-filters"></div>
+        <div class="pl-scroll"><div id="pl-list"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ 3D NETWORK BACKGROUND ============
+const canvas = document.getElementById('network-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, mouseX = -9999, mouseY = -9999, nodes = [], animId;
+
+function resizeCanvas() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+document.addEventListener('mouseleave', () => { mouseX = -9999; mouseY = -9999; });
+
+class Node {
+  constructor(layer) {
+    this.layer = layer;
+    const s = [.3,.6,1][layer];
+    this.x = Math.random() * W; this.y = Math.random() * H;
+    this.vx = (Math.random() - .5) * s * .5; this.vy = (Math.random() - .5) * s * .5;
+    this.r = [1.2, 2, 3][layer]; this.alpha = [.15, .35, .6][layer];
+    this.pulsePhase = Math.random() * Math.PI * 2;
+    this.color = Math.random() > .3 ? [6,182,212] : [99,102,241];
+  }
+  update(t) {
+    this.x += this.vx; this.y += this.vy;
+    if (this.x < -50) this.x = W + 50; if (this.x > W + 50) this.x = -50;
+    if (this.y < -50) this.y = H + 50; if (this.y > H + 50) this.y = -50;
+    if (this.layer === 2) {
+      const dx = mouseX - this.x, dy = mouseY - this.y, d = Math.sqrt(dx*dx + dy*dy);
+      if (d < 200 && d > 1) { this.vx += dx / d * .03; this.vy += dy / d * .03; }
+    }
+    this.vx *= .99; this.vy *= .99;
+    this.pulse = .7 + .3 * Math.sin(t * .002 + this.pulsePhase);
+  }
+  draw() {
+    const a = this.alpha * this.pulse;
+    ctx.beginPath(); ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${this.color[0]},${this.color[1]},${this.color[2]},${a})`; ctx.fill();
+    ctx.beginPath(); ctx.arc(this.x, this.y, this.r * 3, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${this.color[0]},${this.color[1]},${this.color[2]},${a * .15})`; ctx.fill();
+  }
+}
+
+function initNodes() {
+  nodes = [];
+  const count = Math.min(Math.floor(W * H / 6000), 300);
+  for (let i = 0; i < count; i++) {
+    const layer = i < count * .4 ? 0 : i < count * .75 ? 1 : 2;
+    nodes.push(new Node(layer));
+  }
+}
+initNodes();
+window.addEventListener('resize', initNodes);
+
+let connCount = 0;
+function drawNetwork(t) {
+  ctx.clearRect(0, 0, W, H); connCount = 0;
+  for (let layer = 0; layer < 3; layer++) {
+    const ln = nodes.filter(n => n.layer === layer);
+    const maxDist = [80, 120, 160][layer], lineAlpha = [.03, .06, .12][layer];
+    for (let i = 0; i < ln.length; i++) {
+      for (let j = i + 1; j < ln.length; j++) {
+        const dx = ln[i].x - ln[j].x, dy = ln[i].y - ln[j].y, d = Math.sqrt(dx*dx + dy*dy);
+        if (d < maxDist) {
+          ctx.beginPath(); ctx.moveTo(ln[i].x, ln[i].y); ctx.lineTo(ln[j].x, ln[j].y);
+          ctx.strokeStyle = `rgba(6,182,212,${lineAlpha * (1 - d / maxDist)})`;
+          ctx.lineWidth = layer === 2 ? 1 : .5; ctx.stroke(); connCount++;
+        }
+      }
+    }
+  }
+  const nearNodes = nodes.filter(n => n.layer === 2);
+  for (const n of nearNodes) {
+    const dx = mouseX - n.x, dy = mouseY - n.y, d = Math.sqrt(dx*dx + dy*dy);
+    if (d < 180) {
+      ctx.beginPath(); ctx.moveTo(mouseX, mouseY); ctx.lineTo(n.x, n.y);
+      ctx.strokeStyle = `rgba(99,102,241,${.25 * (1 - d / 180)})`; ctx.lineWidth = 1.5; ctx.stroke(); connCount++;
+    }
+  }
+  for (const n of nodes) { n.update(t); n.draw(); }
+}
+
+function animate(t) {
+  drawNetwork(t);
+  document.getElementById('ns-nodes').textContent = nodes.length;
+  document.getElementById('ns-connections').textContent = connCount;
+  document.getElementById('ns-latency').textContent = Math.floor(8 + Math.sin(t * .001) * 4) + 'ms';
+  animId = requestAnimationFrame(animate);
+}
+animate(0);
+
+// ============ THEME TOGGLE ============
+let isDark = true;
+function toggleTheme() {
+  isDark = !isDark;
+  document.body.classList.toggle('light', !isDark);
+  document.getElementById('theme-label').textContent = isDark ? '🌙' : '☀️';
+  // Reinit nodes with new colors
+  nodes.forEach(n => {
+    const s = getComputedStyle(document.documentElement);
+    if (Math.random() > .3) {
+      n.color = [parseInt(s.getPropertyValue('--node-color1-r')),parseInt(s.getPropertyValue('--node-color1-g')),parseInt(s.getPropertyValue('--node-color1-b'))];
+    } else {
+      n.color = [parseInt(s.getPropertyValue('--node-color2-r')),parseInt(s.getPropertyValue('--node-color2-g')),parseInt(s.getPropertyValue('--node-color2-b'))];
+    }
+  });
+}
+
+// ============ APP LOGIC ============
+const SQUADS = {
+  ssvo:{name:'SSVO',icon:'🏢',color:'#6366f1'},
+  app:{name:'App Minha Unifique',icon:'📱',color:'#06b6d4'},
+  devops:{name:'DevOps',icon:'⚙️',color:'#f59e0b'},
+  automacao:{name:'Otimização e Automação de Processos',icon:'🤖',color:'#8b5cf6'},
+  falcon:{name:'Falcon',icon:'🦅',color:'#f43f5e'}
+};
+const ONGOING = {
+  ssvo:['Suporte, apoio e Sustentação dos sistemas e serviços ERP / BTV / Integrador / etc.'],
+  devops:['Limpeza e realocação de recursos computacionais','Apoio ao setor de Segurança da Informação nas correções de vulnerabilidades e eventos de análises de superfície & pentests','Apoio à equipe de Desenvolvimento e suporte junto aos Ambientes']
+};
+
+const DEFAULT_PROJECTS=[{id:1,name:'M&A - Vex',squad:'ssvo',quarter:'Q1',year:'2025',highlight:false},{id:2,name:'Encerramento de Contrato AMS - Envolti',squad:'ssvo',quarter:'Q1',year:'2025',highlight:true},{id:3,name:'ROPA (Cyber)',squad:'ssvo',quarter:'Q1',year:'2025',highlight:false},{id:4,name:'Implantação de KPIs',squad:'ssvo',quarter:'Q1',year:'2025',highlight:false},{id:5,name:'Integração SMS InfoBip',squad:'ssvo',quarter:'Q2',year:'2025',highlight:false},{id:6,name:'Reajuste Inflacionário e Troca Plano (R&TP)',squad:'ssvo',quarter:'Q2',year:'2025',highlight:true},{id:7,name:'Estabilização e Monitoramento BTV',squad:'ssvo',quarter:'Q2',year:'2025',highlight:true},{id:8,name:'Pen-Test Security',squad:'ssvo',quarter:'Q3',year:'2025',highlight:false},{id:9,name:'Interceptor V6',squad:'ssvo',quarter:'Q3',year:'2025',highlight:false},{id:10,name:'ITGC - Auditoria (2026)',squad:'ssvo',quarter:'Q4',year:'2025',highlight:true},{id:11,name:'BTV - Franquias',squad:'ssvo',quarter:'Q4',year:'2025',highlight:true},{id:12,name:'Novo Bilhetador (2026)',squad:'ssvo',quarter:'Q4',year:'2025',highlight:true},{id:13,name:'Central do Assinante (2026)',squad:'ssvo',quarter:'Q4',year:'2025',highlight:false},{id:14,name:'M&A - Arcos',squad:'ssvo',quarter:'Q4',year:'2025',highlight:false},{id:15,name:'M&A - Tropeiros',squad:'ssvo',quarter:'Q4',year:'2025',highlight:false},{id:16,name:'M&A - Seaside (2026)',squad:'ssvo',quarter:'Q4',year:'2025',highlight:false},{id:17,name:'NFCom (2026)',squad:'ssvo',quarter:'Q4',year:'2025',highlight:true},{id:18,name:'RGC (2026)',squad:'ssvo',quarter:'Q4',year:'2025',highlight:false},{id:19,name:'MCP-AI (2026)',squad:'ssvo',quarter:'Q4',year:'2025',highlight:false},{id:20,name:'Refatoração do FrontEnd - Identidade Visual Unifique',squad:'app',quarter:'Q1',year:'2025',highlight:true},{id:21,name:'Atualização Cadastral',squad:'app',quarter:'Q2',year:'2025',highlight:false},{id:22,name:'Contratação dos Planos de Venda da Móvel',squad:'app',quarter:'Q2',year:'2025',highlight:true},{id:23,name:'Reestruturação de Layout Tela Status da Fatura',squad:'app',quarter:'Q2',year:'2025',highlight:false},{id:24,name:'Refatoração do App - Backend em NestJS',squad:'app',quarter:'Q3',year:'2025',highlight:true},{id:25,name:'Chat Monique - Push Notification',squad:'app',quarter:'Q3',year:'2025',highlight:false},{id:26,name:'RCC - Desbloqueio por Confiança',squad:'app',quarter:'Q4',year:'2025',highlight:false},{id:27,name:'Auto-contratação Telemedicina',squad:'app',quarter:'Q4',year:'2025',highlight:true},{id:28,name:'Auto-contratação Seguro',squad:'app',quarter:'Q4',year:'2025',highlight:true},{id:29,name:'Marketing - Envio de ofertas, novidades e comunicados',squad:'app',quarter:'Q4',year:'2025',highlight:false},{id:30,name:'Cyber - Security Issues',squad:'app',quarter:'Q4',year:'2025',highlight:false},{id:31,name:'Nova Máquina do BTV',squad:'devops',quarter:'Q1',year:'2025',highlight:true},{id:32,name:'Atualização da versão do BTV PHP 7.4',squad:'devops',quarter:'Q1',year:'2025',highlight:false},{id:33,name:'Migração de ambiente do ERP para nova arquitetura k8s',squad:'devops',quarter:'Q1',year:'2025',highlight:true},{id:34,name:'Criação de monitoramento e Automação KPI - Downtime',squad:'devops',quarter:'Q1',year:'2025',highlight:false},{id:35,name:'Criação de documentação/arquitetura para ambiente k8s',squad:'devops',quarter:'Q2',year:'2025',highlight:false},{id:36,name:'Criação de ambiente de Desenvolvimento - VPS',squad:'devops',quarter:'Q2',year:'2025',highlight:true},{id:37,name:'Criação de stack / observabilidade (Elastic/Kibana)',squad:'devops',quarter:'Q3',year:'2025',highlight:true},{id:38,name:'Higienização dos proxies',squad:'devops',quarter:'Q3',year:'2025',highlight:false},{id:39,name:'Preparação de Ambiente BTV-Franquias',squad:'devops',quarter:'Q3',year:'2025',highlight:false},{id:40,name:'Criação de política de autoscaling para aplicações em produção',squad:'devops',quarter:'Q3',year:'2025',highlight:false},{id:41,name:'Criação Proxys Projeto IFS para acesso Web',squad:'devops',quarter:'Q3',year:'2025',highlight:false},{id:42,name:'Automação de Publicação do App nas Lojas (Apple e Play Store)',squad:'devops',quarter:'Q3',year:'2025',highlight:true},{id:43,name:'Criação da Pipeline de build & Processo de deploy Protheus',squad:'devops',quarter:'Q4',year:'2025',highlight:false},{id:44,name:'Migração de aplicações legadas Docker para Kubernetes',squad:'devops',quarter:'Q4',year:'2025',highlight:false},{id:45,name:'FinOps',squad:'devops',quarter:'Q4',year:'2025',highlight:true},{id:46,name:'Padronização das Pipelines dos Projetos (Kubernetes e Docker)',squad:'devops',quarter:'Q4',year:'2025',highlight:false},{id:47,name:'Apoio aos times junto as atividades de Auditoria',squad:'devops',quarter:'Q4',year:'2025',highlight:true},{id:48,name:'Certificação de formações de NRs',squad:'automacao',quarter:'Q3',year:'2025',highlight:true},{id:49,name:'Aplicação de GMUD - CGR',squad:'automacao',quarter:'Q3',year:'2025',highlight:true},{id:50,name:'Dashboard Microsoft Project',squad:'automacao',quarter:'Q3',year:'2025',highlight:false},{id:51,name:'Criação de novos usuários',squad:'automacao',quarter:'Q3',year:'2025',highlight:false},{id:52,name:'Grid de licenças',squad:'automacao',quarter:'Q3',year:'2025',highlight:false},{id:53,name:'Dashboard Microsoft Project - SPRINTS',squad:'automacao',quarter:'Q3',year:'2025',highlight:false},{id:54,name:'App de recados - Saudavelmente',squad:'automacao',quarter:'Q3',year:'2025',highlight:false},{id:55,name:'App de consulta de usuários',squad:'automacao',quarter:'Q3',year:'2025',highlight:false},{id:56,name:'Aplicação de GMUD - Equipe 5G',squad:'automacao',quarter:'Q4',year:'2025',highlight:false},{id:57,name:'Inclusão de colaboradores em plano Unimed',squad:'automacao',quarter:'Q4',year:'2025',highlight:true},{id:58,name:'Controle de Usuários Terceiros',squad:'automacao',quarter:'Q4',year:'2025',highlight:true},{id:59,name:'Bloqueio de usuários de férias',squad:'automacao',quarter:'Q4',year:'2025',highlight:true},{"id":73,"name":"Liberação do fluxo de vendas - Novo acesso","squad":"falcon","year":"2025","quarter":"Q1","highlight":true},{"id":74,"name":"Liberação do fluxo de vendas - Adicional de serviço","squad":"falcon","year":"2025","quarter":"Q1","highlight":false},{"id":75,"name":"Cálculo automático de taxa de instalação e fidelidade","squad":"falcon","year":"2025","quarter":"Q1","highlight":false},{"id":76,"name":"Tela de acompanhamento de vendas para o consultor","squad":"falcon","year":"2025","quarter":"Q1","highlight":false},{"id":77,"name":"Automatização das vendas de Novo acesso via Monique","squad":"falcon","year":"2025","quarter":"Q1","highlight":true},{"id":78,"name":"Automatização das vendas de Adicional de serviço via Monique","squad":"falcon","year":"2025","quarter":"Q1","highlight":false},{"id":79,"name":"Liberação do fluxo de vendas - Transferência de endereço","squad":"falcon","year":"2025","quarter":"Q2","highlight":true},{"id":80,"name":"Automatização das vendas de Transferência de endereço via Monique","squad":"falcon","year":"2025","quarter":"Q2","highlight":false},{"id":81,"name":"Melhorias no fluxo de venda de serviço móvel","squad":"falcon","year":"2025","quarter":"Q2","highlight":false},{"id":82,"name":"Liberação do fluxo de vendas - Renovação contratual","squad":"falcon","year":"2025","quarter":"Q3","highlight":false},{"id":83,"name":"Automatização das vendas de Renovação contratual via Monique, consumindo o Falcon","squad":"falcon","year":"2025","quarter":"Q3","highlight":false},{"id":84,"name":"Venda de plyears móvel pré pago","squad":"falcon","year":"2025","quarter":"Q3","highlight":false},{"id":85,"name":"Melhorias na performance de consulta de viabilidade","squad":"falcon","year":"2025","quarter":"Q4","highlight":false},{"id":86,"name":"Integração com o IFS Assyst para projeto Apollo","squad":"falcon","year":"2025","quarter":"Q4","highlight":false},{"id":87,"name":"Modulo Fulfillment - (Orquestrador de ações após a venda estar concluída e após visita técnica)","squad":"falcon","year":"2025","quarter":"Q4","highlight":false},{"id":88,"name":"Melhoria de processo e fluxos de engenharia em tempo de venda","squad":"falcon","year":"2025","quarter":"Q4","highlight":false}];
+
+let projects=[...DEFAULT_PROJECTS],nextId=100,editId=null,currentYear='2025',activeTab='ssvo',modalFilter='all',formFilter=null;
+
+async function loadData(){try{const r=await window.storage.get('retro-projects');if(r&&r.value){const d=JSON.parse(r.value);projects=d.projects||DEFAULT_PROJECTS;nextId=d.nextId||100}}catch(e){projects=[...DEFAULT_PROJECTS];nextId=100}render()}
+async function saveData(){try{await window.storage.set('retro-projects',JSON.stringify({projects,nextId}))}catch(e){console.error('Save error',e)}}
+
+function render(){
+  const yp=projects.filter(p=>p.year===currentYear);
+  document.getElementById('display-year').textContent=currentYear;
+  document.getElementById('footer-year').textContent=currentYear;
+  document.getElementById('stat-entregas').textContent=yp.length+'+';
+  document.getElementById('stat-squads').textContent=Object.keys(SQUADS).length;
+  const fixedYears=['2025','2026','2027'];const sel=document.getElementById('yearSelector');sel.innerHTML='';
+  fixedYears.forEach(y=>{const o=document.createElement('option');o.value=y;o.textContent=y;if(y===currentYear)o.selected=true;sel.appendChild(o)});
+  const tc=document.getElementById('tabs-container');tc.innerHTML='';
+  Object.entries(SQUADS).forEach(([k,v])=>{const b=document.createElement('button');b.className='tab-btn'+(k===activeTab?' active':'');b.textContent=k==='automacao'?'Automação':v.name;b.onclick=()=>{activeTab=k;render()};tc.appendChild(b)});
+  const cc=document.getElementById('content-container');cc.innerHTML='';
+  Object.entries(SQUADS).forEach(([k,s])=>{const sp=yp.filter(p=>p.squad===k);const div=document.createElement('div');div.className='tab-content cat-'+k+(k===activeTab?' active':'');const ongoing=ONGOING[k]||[];const ongoingHtml=ongoing.map(t=>`<div class="ongoing-bar"><div class="pulse"></div><span>${t}</span></div>`).join('');
+  div.innerHTML=`<div class="section-header"><div class="section-icon" style="background:linear-gradient(135deg,${hexToRgba(s.color,.15)},${hexToRgba(s.color,.03)});border:1px solid ${hexToRgba(s.color,.2)}">${s.icon}</div><div><h2>${s.name}</h2><div class="count">${sp.length} entregas ao longo do ano</div></div></div><div class="timeline">${['Q1','Q2','Q3','Q4'].map((q,i)=>{const qp=sp.filter(p=>p.quarter===q);return`<div class="quarter-col"><div class="quarter-label q${i+1}-label">${q}</div>${qp.length?qp.map(p=>`<div class="card${p.highlight?' highlight':''}"><h3>${esc(p.name)}</h3></div>`).join(''):'<div class="empty-q"></div>'}</div>`}).join('')}${ongoingHtml}</div>`;cc.appendChild(div)});
+}
+
+function hexToRgba(h,a){const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);return`rgba(${r},${g},${b},${a})`}
+function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML}
+function changeYear(y){currentYear=y;render()}
+
+function openModal(){document.getElementById('modal').classList.add('open');renderModalList()}
+function closeModal(){document.getElementById('modal').classList.remove('open');resetForm()}
+function resetForm(){document.getElementById('f-name').value='';document.getElementById('f-squad').value='';document.getElementById('f-quarter').value='';document.getElementById('f-year').value='';document.getElementById('f-highlight').checked=false;editId=null;formFilter=null;document.getElementById('btn-clear-filter').style.display='none';document.getElementById('btn-save').textContent='Adicionar Projeto';document.getElementById('modal-title').textContent='Gerenciar Projetos'}
+
+function filterProjects(){const name=document.getElementById('f-name').value.trim().toLowerCase();const squad=document.getElementById('f-squad').value;const quarter=document.getElementById('f-quarter').value;const year=document.getElementById('f-year').value;const highlight=document.getElementById('f-highlight').checked;formFilter={name,squad,quarter,year,highlight};document.getElementById('btn-clear-filter').style.display='';renderModalList()}
+function clearFilter(){formFilter=null;document.getElementById('f-name').value='';document.getElementById('f-highlight').checked=false;document.getElementById('btn-clear-filter').style.display='none';renderModalList()}
+
+function saveProject(){const name=document.getElementById('f-name').value.trim();if(!name){document.getElementById('f-name').focus();return}const squad=document.getElementById('f-squad').value;const quarter=document.getElementById('f-quarter').value;const year=document.getElementById('f-year').value;const highlight=document.getElementById('f-highlight').checked;if(!squad||!quarter||!year){alert('Preencha todos os campos');return}if(editId!==null){const idx=projects.findIndex(p=>p.id===editId);if(idx>=0)projects[idx]={...projects[idx],name,squad,quarter,year,highlight};editId=null}else{projects.push({id:nextId++,name,squad,quarter,year,highlight})}saveData();resetForm();renderModalList();render()}
+
+function editProject(id){const p=projects.find(x=>x.id===id);if(!p)return;editId=id;document.getElementById('f-name').value=p.name;document.getElementById('f-squad').value=p.squad;document.getElementById('f-quarter').value=p.quarter;document.getElementById('f-year').value=p.year;document.getElementById('f-highlight').checked=p.highlight;document.getElementById('btn-save').textContent='Salvar Alterações';document.getElementById('modal-title').textContent='Editando: '+p.name;document.getElementById('f-name').focus()}
+
+function deleteProject(id){projects=projects.filter(p=>p.id!==id);if(editId===id)resetForm();saveData();renderModalList();render()}
+
+function renderModalList(){const container=document.getElementById('pl-list');const countEl=document.getElementById('pl-count');const filtersEl=document.getElementById('pl-filters');
+let html=`<span class="pl-filter ${modalFilter==='all'?'active':''}" onclick="setModalFilter('all')">Todos</span>`;Object.entries(SQUADS).forEach(([k,v])=>{const label=k==='automacao'?'Automação':v.name;html+=`<span class="pl-filter ${modalFilter===k?'active':''}" onclick="setModalFilter('${k}')">${label}</span>`});filtersEl.innerHTML=html;
+let filtered=modalFilter==='all'?[...projects]:projects.filter(p=>p.squad===modalFilter);
+if(formFilter){if(formFilter.name)filtered=filtered.filter(p=>p.name.toLowerCase().includes(formFilter.name));if(formFilter.squad)filtered=filtered.filter(p=>p.squad===formFilter.squad);if(formFilter.quarter)filtered=filtered.filter(p=>p.quarter===formFilter.quarter);if(formFilter.year)filtered=filtered.filter(p=>p.year===formFilter.year);if(formFilter.highlight)filtered=filtered.filter(p=>p.highlight===true)}
+filtered.sort((a,b)=>{if(a.year!==b.year)return a.year.localeCompare(b.year);if(a.squad!==b.squad)return a.squad.localeCompare(b.squad);return a.quarter.localeCompare(b.quarter)});
+countEl.textContent=filtered.length;
+if(!filtered.length){container.innerHTML='<div class="pl-empty">Nenhum projeto encontrado</div>';return}
+container.innerHTML=filtered.map(p=>{const qn=p.quarter.replace('Q','');return`<div class="pl-item"><div class="pl-item-info"><span class="pl-item-name">${esc(p.name)}</span></div><div class="pl-item-meta"><span class="pl-tag" style="background:rgba(255,255,255,.05);color:#64748b">${p.year}</span><span class="pl-tag pl-tag-q${qn}">${p.quarter}</span>${p.highlight?'<span class="pl-tag pl-tag-star">⭐</span>':''}</div><div class="pl-actions"><button title="Editar" onclick="editProject(${p.id})">✏️</button><button class="del" title="Excluir" onclick="deleteProject(${p.id})">🗑️</button></div></div>`}).join('')}
+
+function setModalFilter(f){modalFilter=f;renderModalList()}
+
+function exportJSON(){const data=projects.map(p=>({titulo:p.name,squad:p.squad,ano:p.year,trimestre:p.quarter,destaque:p.highlight}));const json=JSON.stringify(data,null,2);const blob=new Blob([json],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='projetos.json';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url)}
+
+function importJSON(e){const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=function(ev){try{const data=JSON.parse(ev.target.result);if(!Array.isArray(data)){alert('Formato inválido.');return}projects=data.map((p,i)=>({id:nextId+i,name:p.titulo||p.name||'',squad:p.squad||'ssvo',year:p.ano||p.year||'2025',quarter:p.trimestre||p.quarter||'Q1',highlight:p.destaque!=null?p.destaque:(p.highlight||false)}));nextId+=data.length+1;saveData();render();if(document.getElementById('modal').classList.contains('open'))renderModalList();alert('Importação concluída! '+data.length+' projetos.')}catch(err){alert('Erro: '+err.message)}};reader.readAsText(file);e.target.value=''}
+
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.getElementById('modal').classList.contains('open')){const el=document.activeElement;if(el&&(el.id==='f-name'||el.id==='f-squad'||el.id==='f-quarter'||el.id==='f-year')){e.preventDefault();el.value='';return}if(el&&el.id==='f-highlight'){e.preventDefault();el.checked=false;return}if(formFilter)clearFilter();if(editId!==null){editId=null;document.getElementById('btn-save').textContent='Adicionar Projeto';document.getElementById('modal-title').textContent='Gerenciar Projetos'}}});
+
+// Salvar ao fechar
+window.addEventListener('beforeunload', function(){ saveData(); });
+
+loadData();
+</script>
+</body>
+</html>
